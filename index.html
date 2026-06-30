@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CopaFig — Programação Visual</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --vinho: #8B1A2B;
+      --vinho-hover: #a81f34;
+      --ouro: #D4A017;
+      --ouro-hover: #e0a81c;
+      --areia-claro: #F5E6D3;
+      --areia-medio: #E8D5C4;
+      --areia-escuro: #C4A882;
+      --texto: #2C1810;
+      --texto-claro: #5a3a2a;
+      --sucesso: #2E7D32;
+      --atencao: #F9A825;
+      --inativo: #9E9E9E;
+      --branco: #FFFFFF;
+      --sombra: rgba(44, 24, 16, 0.12);
+      --card-w: 70px;
+      --card-gap: 8px;
+      --header-h: 72px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--areia-claro);
+      color: var(--texto);
+      line-height: 1.5;
+      min-height: 100vh;
+      padding-bottom: 0;
+    }
+
+    button { cursor: pointer; font-family: inherit; }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--vinho);
+      color: var(--branco);
+      padding: 12px 20px;
+      text-align: center;
+      box-shadow: 0 2px 8px var(--sombra);
+    }
+    header h1 {
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+    }
+    header h1 span {
+      color: var(--ouro);
+    }
+    header p {
+      font-size: 0.8rem;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+
+    /* Home section */
+    #home {
+      background: var(--branco);
+      margin: 12px 16px;
+      padding: 16px 20px;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px var(--sombra);
+    }
+    #home h2 {
+      font-size: 1rem;
+      color: var(--vinho);
+      margin-bottom: 8px;
+    }
+    #home ol {
+      padding-left: 20px;
+      font-size: 0.88rem;
+      color: var(--texto-claro);
+    }
+    #home ol li { margin-bottom: 4px; }
+    #home ol li:last-child { margin-bottom: 0; }
+
+    /* Tabs */
+    #tabs {
+      display: flex;
+      gap: 4px;
+      padding: 0 16px;
+      margin-bottom: 12px;
+    }
+    #tabs button {
+      flex: 1;
+      padding: 10px 6px;
+      border: 2px solid var(--areia-escuro);
+      border-radius: 8px 8px 0 0;
+      background: var(--areia-medio);
+      color: var(--texto-claro);
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      min-height: 44px;
+    }
+    #tabs button.active {
+      background: var(--vinho);
+      color: var(--branco);
+      border-color: var(--vinho);
+    }
+    #tabs button:not(.active):hover {
+      background: var(--areia-escuro);
+      color: var(--texto);
+    }
+
+    /* Sticker grid */
+    #grid {
+      padding: 0 16px 16px;
+    }
+    .country-section {
+      margin-bottom: 20px;
+    }
+    .country-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      margin-bottom: 6px;
+      background: var(--areia-medio);
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--vinho);
+    }
+    .country-header .flag {
+      font-size: 1.2rem;
+    }
+    .sticker-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(var(--card-w), 1fr));
+      gap: var(--card-gap);
+    }
+
+    /* Sticker card */
+    .sticker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      padding: 6px 2px;
+      border-radius: 8px;
+      background: var(--branco);
+      border: 2px solid var(--areia-escuro);
+      min-height: 80px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s;
+      position: relative;
+    }
+    .sticker:active { transform: scale(0.95); }
+    .sticker .code {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--texto-claro);
+      pointer-events: none;
+    }
+    .sticker .num {
+      font-size: 0.55rem;
+      color: var(--inativo);
+      pointer-events: none;
+    }
+    .sticker .controls {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      pointer-events: none;
+      margin-top: 2px;
+    }
+    .sticker .controls button {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      min-height: 28px;
+      border: 1px solid var(--areia-escuro);
+      border-radius: 4px;
+      background: var(--areia-claro);
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      pointer-events: auto;
+      color: var(--texto);
+    }
+    .sticker .controls button:active { transform: scale(0.9); }
+    .sticker .controls .qty {
+      min-width: 22px;
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      pointer-events: none;
+      color: var(--texto);
+    }
+
+    /* States */
+    .sticker.missing {
+      background: var(--branco);
+      border-color: var(--inativo);
+      opacity: 0.7;
+    }
+    .sticker.missing .controls button {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .sticker.owned {
+      background: #e8f5e9;
+      border-color: var(--sucesso);
+      opacity: 1;
+    }
+    .sticker.owned .controls button { opacity: 1; }
+
+    .sticker.duplicate {
+      background: #fff8e1;
+      border-color: var(--atencao);
+      opacity: 1;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--inativo);
+      font-size: 0.95rem;
+    }
+
+    /* Report footer */
+    footer {
+      background: var(--vinho);
+      color: var(--branco);
+      padding: 16px;
+      margin-top: 12px;
+    }
+    footer h2 {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      color: var(--ouro);
+    }
+    footer pre {
+      background: #1a0a0e;
+      color: #e0e0e0;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      font-family: 'Courier New', Courier, monospace;
+    }
+    footer .report-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    #copy-btn {
+      padding: 10px 24px;
+      min-height: 44px;
+      border: none;
+      border-radius: 8px;
+      background: var(--ouro);
+      color: var(--texto);
+      font-size: 0.9rem;
+      font-weight: 700;
+      transition: background 0.2s;
+    }
+    #copy-btn:hover { background: var(--ouro-hover); }
+    #copy-btn:active { transform: scale(0.97); }
+    #copy-btn.copied { background: var(--sucesso); color: var(--branco); }
+
+    #copy-feedback {
+      font-size: 0.82rem;
+      color: var(--ouro);
+    }
+    #copy-feedback.error { color: #ff6b6b; }
+
+    #fallback-textarea {
+      width: 100%;
+      min-height: 60px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid var(--areia-escuro);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.78rem;
+      background: #1a0a0e;
+      color: #e0e0e0;
+      resize: vertical;
+      margin-top: 8px;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      :root { --card-w: 58px; --card-gap: 5px; }
+      #tabs button { font-size: 0.72rem; padding: 8px 4px; }
+      header h1 { font-size: 1.1rem; }
+      .sticker { min-height: 68px; padding: 4px 1px; }
+      .sticker .code { font-size: 0.62rem; }
+    }
+
+    @media (min-width: 768px) {
+      :root { --card-w: 80px; }
+      #home, #tabs, #grid { max-width: 900px; margin-left: auto; margin-right: auto; }
+      footer { padding: 20px 24px; }
+      footer pre { max-width: 900px; margin-left: auto; margin-right: auto; }
+      footer .report-actions { max-width: 900px; margin-left: auto; margin-right: auto; }
+    }
+
+    @media (min-width: 1200px) {
+      :root { --card-w: 90px; }
+      #home, #tabs, #grid { max-width: 1100px; }
+      footer pre { max-width: 1100px; }
+      footer .report-actions { max-width: 1100px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Copa<span>Fig</span></h1>
+    <p>Programação Visual — Troca de Figurinhas da Copa do Mundo</p>
+  </header>
+
+  <section id="home">
+    <h2>Como usar</h2>
+    <ol>
+      <li><strong>Clique</strong> em uma figurinha para marcá-la como <em>possuída</em></li>
+      <li>Use <strong>+</strong> e <strong>−</strong> para ajustar quantas repetidas você tem</li>
+      <li>Use as <strong>abas</strong> para filtrar: Todas, Faltantes, Possuídas ou Repetidas</li>
+      <li>Role até o <strong>relatório</strong> no rodapé e clique em <strong>Copiar</strong> para colar no WhatsApp</li>
+    </ol>
+  </section>
+
+  <nav id="tabs">
+    <button class="tab active" data-filter="todas">Todas</button>
+    <button class="tab" data-filter="faltantes">Faltantes</button>
+    <button class="tab" data-filter="possuidas">Possuídas</button>
+    <button class="tab" data-filter="repetidas">Repetidas</button>
+  </nav>
+
+  <main id="grid"></main>
+
+  <footer id="report">
+    <h2>📋 Relatório de Troca</h2>
+    <pre id="report-text">Nenhuma figurinha marcada ainda.</pre>
+    <div class="report-actions">
+      <button id="copy-btn">📋 Copiar para WhatsApp</button>
+      <span id="copy-feedback"></span>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // ─── Sticker Data ────────────────────────────────────────────────
+      var COUNTRIES = [
+        { code: 'FWC', name: 'FIFA World Cup',       flag: '🏆', count: 10 },
+        { code: 'ALG', name: 'Argélia',              flag: '🇩🇿', count: 20 },
+        { code: 'ARG', name: 'Argentina',            flag: '🇦🇷', count: 20 },
+        { code: 'AUS', name: 'Austrália',            flag: '🇦🇺', count: 20 },
+        { code: 'AUT', name: 'Áustria',              flag: '🇦🇹', count: 20 },
+        { code: 'BEL', name: 'Bélgica',              flag: '🇧🇪', count: 20 },
+        { code: 'BIH', name: 'Bósnia e Herzegovina', flag: '🇧🇦', count: 20 },
+        { code: 'BRA', name: 'Brasil',               flag: '🇧🇷', count: 20 },
+        { code: 'CAB', name: 'Cabo Verde',           flag: '🇨🇻', count: 20 },
+        { code: 'CAN', name: 'Canadá',               flag: '🇨🇦', count: 20 },
+        { code: 'COL', name: 'Colômbia',             flag: '🇨🇴', count: 20 },
+        { code: 'COD', name: 'Congo DR',             flag: '🇨🇩', count: 20 },
+        { code: 'CIV', name: 'Costa do Marfim',      flag: '🇨🇮', count: 20 },
+        { code: 'CRO', name: 'Croácia',              flag: '🇭🇷', count: 20 },
+        { code: 'CUW', name: 'Curaçao',              flag: '🇨🇼', count: 20 },
+        { code: 'CZE', name: 'Chéquia',              flag: '🇨🇿', count: 20 },
+        { code: 'ECU', name: 'Equador',              flag: '🇪🇨', count: 20 },
+        { code: 'EGY', name: 'Egito',                flag: '🇪🇬', count: 20 },
+        { code: 'ENG', name: 'Inglaterra',           flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', count: 20 },
+        { code: 'ESP', name: 'Espanha',              flag: '🇪🇸', count: 20 },
+        { code: 'FRA', name: 'França',               flag: '🇫🇷', count: 20 },
+        { code: 'GER', name: 'Alemanha',             flag: '🇩🇪', count: 20 },
+        { code: 'GHA', name: 'Gana',                 flag: '🇬🇭', count: 20 },
+        { code: 'HAI', name: 'Haiti',                flag: '🇭🇹', count: 20 },
+        { code: 'IRN', name: 'Irã',                  flag: '🇮🇷', count: 20 },
+        { code: 'IRQ', name: 'Iraque',               flag: '🇮🇶', count: 20 },
+        { code: 'JOR', name: 'Jordânia',             flag: '🇯🇴', count: 20 },
+        { code: 'JPN', name: 'Japão',                flag: '🇯🇵', count: 20 },
+        { code: 'KOR', name: 'Coreia do Sul',        flag: '🇰🇷', count: 20 },
+        { code: 'KSA', name: 'Arábia Saudita',       flag: '🇸🇦', count: 20 },
+        { code: 'MAR', name: 'Marrocos',             flag: '🇲🇦', count: 20 },
+        { code: 'MEX', name: 'México',               flag: '🇲🇽', count: 20 },
+        { code: 'NED', name: 'Países Baixos',        flag: '🇳🇱', count: 20 },
+        { code: 'NZL', name: 'Nova Zelândia',        flag: '🇳🇿', count: 20 },
+        { code: 'NOR', name: 'Noruega',              flag: '🇳🇴', count: 20 },
+        { code: 'PAN', name: 'Panamá',               flag: '🇵🇦', count: 20 },
+        { code: 'PAR', name: 'Paraguai',             flag: '🇵🇾', count: 20 },
+        { code: 'POR', name: 'Portugal',             flag: '🇵🇹', count: 20 },
+        { code: 'QAT', name: 'Catar',                flag: '🇶🇦', count: 20 },
+        { code: 'RSA', name: 'África do Sul',        flag: '🇿🇦', count: 20 },
+        { code: 'SCO', name: 'Escócia',              flag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', count: 20 },
+        { code: 'SEN', name: 'Senegal',              flag: '🇸🇳', count: 20 },
+        { code: 'SUI', name: 'Suíça',                flag: '🇨🇭', count: 20 },
+        { code: 'SWE', name: 'Suécia',               flag: '🇸🇪', count: 20 },
+        { code: 'TUN', name: 'Tunísia',              flag: '🇹🇳', count: 20 },
+        { code: 'TUR', name: 'Turquia',              flag: '🇹🇷', count: 20 },
+        { code: 'URU', name: 'Uruguai',              flag: '🇺🇾', count: 20 },
+        { code: 'USA', name: 'Estados Unidos',       flag: '🇺🇸', count: 20 },
+        { code: 'UZB', name: 'Uzbequistão',          flag: '🇺🇿', count: 20 }
+      ];
+
+      var allStickers = [];
+      var state = {};
+      var activeFilter = 'todas';
+
+      // Build sticker list and initial state
+      COUNTRIES.forEach(function (c) {
+        for (var i = 1; i <= c.count; i++) {
+          var code = c.code + '-' + i;
+          allStickers.push({ code: code, country: c.code });
+          state[code] = { owned: false, repeats: 0 };
+        }
+      });
+
+      // ─── DOM References ──────────────────────────────────────────────
+      var gridEl = document.getElementById('grid');
+      var reportTextEl = document.getElementById('report-text');
+      var copyBtn = document.getElementById('copy-btn');
+      var copyFeedback = document.getElementById('copy-feedback');
+      var tabBtns = document.querySelectorAll('#tabs .tab');
+
+      // ─── Persistence ──────────────────────────────────────────────────
+      var STORAGE_KEY = 'copafig-state';
+
+      function saveState() {
+        try {
+          var data = {};
+          allStickers.forEach(function (st) {
+            var s = state[st.code];
+            if (s.owned || s.repeats > 0) {
+              data[st.code] = { owned: s.owned, repeats: s.repeats };
+            }
+          });
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {}
+      }
+
+      function loadState() {
+        try {
+          var raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          var data = JSON.parse(raw);
+          allStickers.forEach(function (st) {
+            var saved = data[st.code];
+            if (saved && typeof saved.owned === 'boolean' && typeof saved.repeats === 'number') {
+              state[st.code].owned = saved.owned;
+              state[st.code].repeats = saved.repeats;
+            }
+          });
+        } catch (e) {}
+      }
+
+      // ─── State Mutations ─────────────────────────────────────────────
+      function toggleSticker(code) {
+        var s = state[code];
+        s.owned = !s.owned;
+        if (!s.owned) s.repeats = 0;
+        render();
+      }
+
+      function increment(code) {
+        var s = state[code];
+        if (!s.owned) return;
+        s.repeats += 1;
+        render();
+      }
+
+      function decrement(code) {
+        var s = state[code];
+        if (!s.owned || s.repeats <= 0) return;
+        s.repeats -= 1;
+        render();
+      }
+
+      function setFilter(filter) {
+        activeFilter = filter;
+        tabBtns.forEach(function (btn) {
+          btn.classList.toggle('active', btn.dataset.filter === filter);
+        });
+        render();
+      }
+
+      // ─── Filter Logic ────────────────────────────────────────────────
+      function passesFilter(code) {
+        var s = state[code];
+        switch (activeFilter) {
+          case 'todas':     return true;
+          case 'faltantes': return !s.owned;
+          case 'possuidas': return s.owned && s.repeats === 0;
+          case 'repetidas': return s.owned && s.repeats >= 1;
+          default:          return true;
+        }
+      }
+
+      // ─── Render Grid ─────────────────────────────────────────────────
+      function render() {
+        renderGrid();
+        renderReport();
+        saveState();
+      }
+
+      function renderGrid() {
+        var html = '';
+        var anyVisible = false;
+
+        COUNTRIES.forEach(function (country) {
+          var stickers = allStickers.filter(function (s) {
+            return s.country === country.code && passesFilter(s.code);
+          });
+          if (stickers.length === 0) return;
+          anyVisible = true;
+
+          html += '<div class="country-section">';
+          html += '<div class="country-header">';
+          html += '<span class="flag">' + country.flag + '</span>';
+          html += country.code + ' — ' + country.name;
+          html += '</div>';
+          html += '<div class="sticker-grid">';
+
+          stickers.forEach(function (st) {
+            var s = state[st.code];
+            var cls = 'sticker';
+            if (!s.owned) cls += ' missing';
+            else if (s.repeats > 0) cls += ' duplicate';
+            else cls += ' owned';
+
+            html += '<div class="' + cls + '" data-code="' + st.code + '">';
+            html += '<span class="code">' + st.code + '</span>';
+            html += '<span class="num">nº ' + st.code.split('-')[1] + '</span>';
+            html += '<div class="controls">';
+            html += '<button class="btn-dec" data-code="' + st.code + '">−</button>';
+            html += '<span class="qty">' + s.repeats + '</span>';
+            html += '<button class="btn-inc" data-code="' + st.code + '">+</button>';
+            html += '</div>';
+            html += '</div>';
+          });
+
+          html += '</div></div>';
+        });
+
+        if (!anyVisible) {
+          html = '<div class="empty-state">Nenhuma figurinha encontrada neste filtro.</div>';
+        }
+
+        gridEl.innerHTML = html;
+      }
+
+      // ─── Report Generation ───────────────────────────────────────────
+      function getReportText() {
+        var owned = [];
+        var duplicated = [];
+        var missing = [];
+
+        allStickers.forEach(function (st) {
+          var s = state[st.code];
+          if (!s.owned) {
+            missing.push(st.code);
+          } else if (s.repeats === 0) {
+            owned.push(st.code);
+          } else {
+            duplicated.push(st.code + ' (x' + s.repeats + ')');
+          }
+        });
+
+        var parts = [];
+
+        if (missing.length > 0) {
+          parts.push('\uD83C\uDFC6 *FALTANTES*');
+          parts.push(groupByCountry(missing));
+        }
+        if (owned.length > 0) {
+          parts.push('\uD83C\uDFC6 *POSSU\u00CDDAS*');
+          parts.push(groupByCountry(owned));
+        }
+        if (duplicated.length > 0) {
+          parts.push('\uD83C\uDFC6 *REPETIDAS*');
+          parts.push(groupByCountry(duplicated));
+        }
+
+        if (parts.length === 0) {
+          return 'Nenhuma figurinha marcada ainda.';
+        }
+
+        return parts.join('\n\n');
+      }
+
+      function groupByCountry(codes) {
+        var groups = {};
+        codes.forEach(function (code) {
+          var country = code.split('-')[0];
+          if (!groups[country]) groups[country] = [];
+          groups[country].push(code);
+        });
+        var lines = [];
+        var sortedCountries = Object.keys(groups).sort();
+        sortedCountries.forEach(function (c) {
+          lines.push(groups[c].join(', '));
+        });
+        return lines.join('\n');
+      }
+
+      function renderReport() {
+        var text = getReportText();
+        reportTextEl.textContent = text;
+      }
+
+      // ─── Copy to Clipboard ───────────────────────────────────────────
+      function copyReport() {
+        var text = reportTextEl.textContent;
+        if (!text || text === 'Nenhuma figurinha marcada ainda.') {
+          copyFeedback.textContent = 'Nada para copiar — marque algumas figurinhas primeiro.';
+          copyFeedback.className = 'error';
+          return;
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () {
+            copyBtn.textContent = '✅ Copiado!';
+            copyBtn.classList.add('copied');
+            copyFeedback.textContent = 'Texto copiado! Cole no WhatsApp.';
+            copyFeedback.className = '';
+            setTimeout(function () {
+              copyBtn.textContent = '📋 Copiar para WhatsApp';
+              copyBtn.classList.remove('copied');
+              copyFeedback.textContent = '';
+            }, 2500);
+          }).catch(function () {
+            fallbackCopy(text);
+          });
+        } else {
+          fallbackCopy(text);
+        }
+      }
+
+      function fallbackCopy(text) {
+        var ta = document.getElementById('fallback-textarea');
+        if (!ta) {
+          ta = document.createElement('textarea');
+          ta.id = 'fallback-textarea';
+          ta.readOnly = true;
+          copyBtn.parentNode.appendChild(ta);
+        }
+        ta.value = text;
+        ta.style.display = 'block';
+        ta.select();
+        try {
+          document.execCommand('copy');
+          copyBtn.textContent = '✅ Copiado!';
+          copyBtn.classList.add('copied');
+          copyFeedback.textContent = 'Texto copiado (fallback). Cole no WhatsApp.';
+          copyFeedback.className = '';
+        } catch (e) {
+          copyFeedback.textContent = 'Selecione o texto abaixo e copie manualmente (Ctrl+C / Cmd+C).';
+          copyFeedback.className = 'error';
+        }
+        setTimeout(function () {
+          copyBtn.textContent = '📋 Copiar para WhatsApp';
+          copyBtn.classList.remove('copied');
+        }, 2500);
+      }
+
+      // ─── Event Delegation ────────────────────────────────────────────
+      gridEl.addEventListener('click', function (e) {
+        var target = e.target;
+
+        // +/- buttons
+        if (target.classList.contains('btn-inc')) {
+          e.stopPropagation();
+          increment(target.dataset.code);
+          return;
+        }
+        if (target.classList.contains('btn-dec')) {
+          e.stopPropagation();
+          decrement(target.dataset.code);
+          return;
+        }
+
+        // Sticker card toggle
+        var card = target.closest('.sticker');
+        if (card) {
+          toggleSticker(card.dataset.code);
+        }
+      });
+
+      // Tab clicks
+      tabBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          setFilter(this.dataset.filter);
+        });
+      });
+
+      // Copy button
+      copyBtn.addEventListener('click', copyReport);
+
+      // ─── Init ────────────────────────────────────────────────────────
+      loadState();
+      render();
+
+    })();
+  </script>
+</body>
+</html>
